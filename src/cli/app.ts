@@ -261,7 +261,7 @@ async function addResourceFlow(db: Db, key: Buffer, project: Project): Promise<v
     key: String(index + 1),
     label: def.label,
   }));
-  const chosenKey = await input.chooseOption('Select an action: ', typeOptions);
+  const chosenKey = await showMenu(null, typeOptions);
   const def = RESOURCE_TYPE_DEFS[Number(chosenKey) - 1];
   const name = await input.askRequired('Name: ');
   const description = await input.ask('Description (optional): ');
