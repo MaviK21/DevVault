@@ -12,7 +12,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "release:windows": "node scripts/build-windows-portable.cjs",
+    "release:verify": "node scripts/verify-portable-release.cjs"
   },
   "dependencies": {
     "argon2": "^0.44.0",
