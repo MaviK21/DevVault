@@ -60,15 +60,15 @@ export async function runScan(db: Db, key: Buffer, sourceName: string, text: str
   const detections = classifyText(text, sourceName);
   terminal.logEvent(`Scanned ${sourceName}: ${detections.length} candidate credential(s)`);
   if (detections.length === 0) {
-    out.print('No credentials detected.');
+    out.print('Данные доступа не обнаружены.');
     return;
   }
   for (const detection of detections) {
     const saved = await handleDetection(db, key, detection);
     if (saved) {
-      terminal.logEvent(`Saved ${detection.type} "${detection.suggestedName}"`);
+      terminal.logEvent(`Сохранено: ${detection.type} «${detection.suggestedName}»`);
     } else {
-      terminal.logEvent(`Ignored ${detection.type} "${detection.suggestedName}"`);
+      terminal.logEvent(`Пропущено: ${detection.type} «${detection.suggestedName}»`);
     }
   }
 }
@@ -77,10 +77,10 @@ async function handleDetection(db: Db, key: Buffer, detection: Detection): Promi
   for (;;) {
     terminal.renderDetection(detection);
     // chooseOption returns the option key in its original case — normalize it.
-    const action = (await input.chooseOption('Action: ', [
-      { key: 'Y', label: 'Save' },
-      { key: 'N', label: 'Ignore' },
-      { key: 'E', label: 'Edit' },
+    const action = (await input.chooseOption('Действие: ', [
+      { key: 'Y', label: 'Сохранить' },
+      { key: 'N', label: 'Игнорировать' },
+      { key: 'E', label: 'Изменить' },
     ])).toLowerCase();
     if (action === 'n') {
       return false;
@@ -95,8 +95,8 @@ async function handleDetection(db: Db, key: Buffer, detection: Detection): Promi
 
 async function editDetection(detection: Detection): Promise<void> {
   const def = getResourceTypeDef(detection.type);
-  out.print('\nEditing detected values. Leave a value empty to keep it.');
-  const name = await input.ask(`Name [${detection.suggestedName}]: `);
+  out.print('\nИзменение найденных данных. Оставьте поле пустым, чтобы сохранить текущее значение.');
+  const name = await input.ask(`Название [${detection.suggestedName}]: `);
   if (name.trim() !== '') {
     detection.suggestedName = name.trim();
   }
@@ -113,14 +113,14 @@ async function editDetection(detection: Detection): Promise<void> {
 async function saveDetection(db: Db, key: Buffer, detection: Detection): Promise<boolean> {
   let project = await pickTargetProject(db);
   if (project === null) {
-    out.print('Save cancelled.');
+    out.print('Сохранение отменено.');
     return false;
   }
   const def = getResourceTypeDef(detection.type);
   const fields: Record<string, string> = { ...detection.fields };
   for (const fieldDef of def.fields) {
     if (fieldDef.required && (fields[fieldDef.name] ?? '').trim() === '') {
-      out.printError(`Missing required field for saving: ${fieldDef.label}`);
+      out.printError(`Для сохранения заполните обязательное поле: ${fieldDef.label}`);
       const value = await promptFieldValue(fieldDef);
       if (value !== '') {
         fields[fieldDef.name] = value;
@@ -128,9 +128,9 @@ async function saveDetection(db: Db, key: Buffer, detection: Detection): Promise
     }
   }
   try {
-    const description = `Detected by DevVault Agent (${detection.source})`;
+    const description = `Обнаружено агентом DevVault (${detection.source})`;
     resources.createResource(db, key, project.id, detection.type, detection.suggestedName, description, fields);
-    out.print(`\nSaved ${detection.type} "${detection.suggestedName}" to project "${project.name}".`);
+    out.print(`\nСохранено: ${getResourceTypeDef(detection.type).label} «${detection.suggestedName}» в проекте «${project.name}».`);
     return true;
   } catch (error) {
     if (error instanceof ValidationError) {
@@ -144,20 +144,20 @@ async function saveDetection(db: Db, key: Buffer, detection: Detection): Promise
 async function pickTargetProject(db: Db): Promise<Project | null> {
   const context = detectProjectContext(db);
   if (context.project !== null) {
-    out.print(`Project context: ${context.project.name}`);
-    const use = await input.confirm(`Save to project "${context.project.name}"?`);
+    out.print(`Контекст проекта: ${context.project.name}`);
+    const use = await input.confirm(`Сохранить в проект «${context.project.name}»?`);
     if (use) {
       return context.project;
     }
   }
   const list = projects.listProjects(db);
   if (list.length === 0) {
-    out.printError('No projects exist. Create a project first (Projects → Create project).');
+    out.printError('Проектов пока нет. Сначала создайте проект (Проекты → Создать проект).');
     return null;
   }
-  out.print('Projects:');
+  out.print('Проекты:');
   for (const project of list) {
     out.print(`  ${project.id}. ${project.name}`);
   }
-  return pickById(list, 'project');
+  return pickById(list, 'проекта');
 }

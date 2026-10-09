@@ -29,115 +29,115 @@ function field(name: string, label: string, opts: Partial<FieldDef> = {}): Field
 export const RESOURCE_TYPE_DEFS: readonly ResourceTypeDef[] = [
   {
     type: 'website',
-    label: 'Website',
+    label: 'Веб-сайт',
     fields: [
-      field('domain', 'Domain', { required: true }),
-      field('protocol', 'Protocol', { defaultValue: 'https' }),
-      field('notes', 'Notes', { multiline: true }),
+      field('domain', 'Домен', { required: true }),
+      field('protocol', 'Протокол', { defaultValue: 'https' }),
+      field('notes', 'Заметки', { multiline: true }),
     ],
   },
   {
     type: 'server',
-    label: 'Server',
+    label: 'Сервер',
     fields: [
-      field('host', 'Host', { required: true }),
-      field('port', 'Port', { kind: 'port' }),
-      field('username', 'Username'),
-      field('password', 'Password', { secret: true }),
-      field('notes', 'Notes', { multiline: true }),
+      field('host', 'Хост', { required: true }),
+      field('port', 'Порт', { kind: 'port' }),
+      field('username', 'Имя пользователя'),
+      field('password', 'Пароль', { secret: true }),
+      field('notes', 'Заметки', { multiline: true }),
     ],
   },
   {
     type: 'ssh',
     label: 'SSH',
     fields: [
-      field('host', 'Host', { required: true }),
-      field('port', 'Port', { kind: 'port' }),
-      field('username', 'Username'),
-      field('password', 'Password', { secret: true }),
-      field('private_key', 'Private key', { secret: true, multiline: true }),
-      field('notes', 'Notes', { multiline: true }),
+      field('host', 'Хост', { required: true }),
+      field('port', 'Порт', { kind: 'port' }),
+      field('username', 'Имя пользователя'),
+      field('password', 'Пароль', { secret: true }),
+      field('private_key', 'Приватный ключ', { secret: true, multiline: true }),
+      field('notes', 'Заметки', { multiline: true }),
     ],
   },
   {
     type: 'database',
-    label: 'Database',
+    label: 'База данных',
     fields: [
-      field('db_type', 'Database type (postgresql / mysql / sqlite)', {
+      field('db_type', 'Тип базы данных (postgresql / mysql / sqlite)', {
         required: true,
         defaultValue: 'postgresql',
       }),
-      field('host', 'Host'),
-      field('port', 'Port', { kind: 'port' }),
-      field('database_name', 'Database name'),
-      field('username', 'Username'),
-      field('password', 'Password', { secret: true }),
-      field('notes', 'Notes', { multiline: true }),
+      field('host', 'Хост'),
+      field('port', 'Порт', { kind: 'port' }),
+      field('database_name', 'Имя базы данных'),
+      field('username', 'Имя пользователя'),
+      field('password', 'Пароль', { secret: true }),
+      field('notes', 'Заметки', { multiline: true }),
     ],
   },
   {
     type: 'api_key',
-    label: 'API Key',
+    label: 'API-ключ',
     fields: [
-      field('service', 'Service', { required: true }),
-      field('key', 'Key', { secret: true, required: true }),
-      field('notes', 'Notes', { multiline: true }),
+      field('service', 'Сервис', { required: true }),
+      field('key', 'Ключ', { secret: true, required: true }),
+      field('notes', 'Заметки', { multiline: true }),
     ],
   },
   {
     type: 'cloudflare',
     label: 'Cloudflare',
     fields: [
-      field('account', 'Account'),
-      field('domain', 'Domain', { required: true }),
-      field('api_token', 'API token', { secret: true, required: true }),
-      field('notes', 'Notes', { multiline: true }),
+      field('account', 'Аккаунт'),
+      field('domain', 'Домен', { required: true }),
+      field('api_token', 'API-токен', { secret: true, required: true }),
+      field('notes', 'Заметки', { multiline: true }),
     ],
   },
   {
     type: 'github',
     label: 'GitHub',
     fields: [
-      field('repository', 'Repository', { required: true }),
-      field('username', 'Username'),
-      field('token', 'Token', { secret: true, required: true }),
-      field('notes', 'Notes', { multiline: true }),
+      field('repository', 'Репозиторий', { required: true }),
+      field('username', 'Имя пользователя'),
+      field('token', 'Токен', { secret: true, required: true }),
+      field('notes', 'Заметки', { multiline: true }),
     ],
   },
   {
     type: 'docker',
     label: 'Docker',
     fields: [
-      field('host', 'Host'),
-      field('port', 'Port', { kind: 'port' }),
-      field('registry', 'Registry'),
-      field('username', 'Username'),
-      field('password', 'Password', { secret: true }),
-      field('notes', 'Notes', { multiline: true }),
+      field('host', 'Хост'),
+      field('port', 'Порт', { kind: 'port' }),
+      field('registry', 'Реестр'),
+      field('username', 'Имя пользователя'),
+      field('password', 'Пароль', { secret: true }),
+      field('notes', 'Заметки', { multiline: true }),
     ],
   },
   {
     type: 'deployadmin',
     label: 'DeployAdmin',
     fields: [
-      field('host', 'Host', { required: true }),
-      field('port', 'Port', { kind: 'port' }),
-      field('username', 'Username'),
-      field('password', 'Password', { secret: true }),
-      field('notes', 'Notes', { multiline: true }),
+      field('host', 'Хост', { required: true }),
+      field('port', 'Порт', { kind: 'port' }),
+      field('username', 'Имя пользователя'),
+      field('password', 'Пароль', { secret: true }),
+      field('notes', 'Заметки', { multiline: true }),
     ],
   },
   {
     type: 'note',
-    label: 'Note',
-    fields: [field('content', 'Content', { required: true, multiline: true })],
+    label: 'Заметка',
+    fields: [field('content', 'Содержимое', { required: true, multiline: true })],
   },
 ];
 
 export function getResourceTypeDef(type: ResourceType): ResourceTypeDef {
   const def = RESOURCE_TYPE_DEFS.find((d) => d.type === type);
   if (def === undefined) {
-    throw new ValidationError(`Unknown resource type: ${type}`);
+    throw new ValidationError(`Неизвестный тип ресурса: ${type}`);
   }
   return def;
 }
@@ -146,7 +146,7 @@ export function validateFieldValue(fieldDef: FieldDef, value: string): void {
   if (fieldDef.kind === 'port') {
     const port = Number(value);
     if (!Number.isInteger(port) || port < 1 || port > 65535) {
-      throw new ValidationError(`Port must be an integer between 1 and 65535, got "${value}".`);
+      throw new ValidationError(`Порт должен быть целым числом от 1 до 65535. Получено: «${value}».`);
     }
   }
 }

@@ -29,10 +29,10 @@ export async function run(): Promise<void> {
     runMigrations(db);
     let key: Buffer;
     if (!vault.vaultExists(db)) {
-      out.print('\nVault not found.');
-      const create = await input.confirm('Create a new Vault?');
+      out.print('\nХранилище не найдено.');
+      const create = await input.confirm('Создать новое хранилище?');
       if (!create) {
-        out.print('\nVault was not created. Goodbye.');
+        out.print('\nХранилище не создано. До свидания.');
         return;
       }
       key = await createVaultFlow(db);
@@ -48,8 +48,8 @@ export async function run(): Promise<void> {
 async function createVaultFlow(db: Db): Promise<Buffer> {
   let password = '';
   for (;;) {
-    password = await input.askSecret('Master password: ');
-    const confirmPassword = await input.askSecret('Confirm password: ');
+    password = await input.askSecret('Мастер-пароль: ');
+    const confirmPassword = await input.askSecret('Подтвердите пароль: ');
     try {
       await vault.createVault(db, password, confirmPassword);
       break;
@@ -61,49 +61,49 @@ async function createVaultFlow(db: Db): Promise<Buffer> {
       throw error;
     }
   }
-  out.print('\nVault created.');
+  out.print('\nХранилище создано.');
   const key = await vault.unlockVault(db, password);
   if (key === null) {
     // Cannot happen right after creation; kept for type-safety.
-    throw new Error('Failed to unlock the freshly created vault.');
+    throw new Error('Не удалось разблокировать только что созданное хранилище.');
   }
   return key;
 }
 
 async function unlockFlow(db: Db): Promise<Buffer> {
   for (let attempt = 1; attempt <= MAX_UNLOCK_ATTEMPTS; attempt += 1) {
-    const password = await input.askSecret('Master password: ');
+    const password = await input.askSecret('Мастер-пароль: ');
     const key = await vault.unlockVault(db, password);
     if (key !== null) {
-      out.print('\nVault unlocked.');
+      out.print('\nХранилище разблокировано.');
       return key;
     }
     const left = MAX_UNLOCK_ATTEMPTS - attempt;
     if (left > 0) {
-      out.printError(`Invalid master password. Attempts left: ${left}.`);
+      out.printError(`Неверный мастер-пароль. Осталось попыток: ${left}.`);
     }
   }
-  out.printError('Too many failed attempts. Exiting.');
+  out.printError('Слишком много неудачных попыток. Выход.');
   process.exit(1);
 }
 
 async function mainMenu(db: Db, key: Buffer): Promise<void> {
   for (;;) {
     const action = await showMenu('DEVVAULT', [
-      { key: '1', label: 'Projects' },
-      { key: '2', label: 'Search' },
-      { key: '3', label: 'Agent (detect credentials)' },
-      { key: '4', label: 'Lock' },
-      { key: '5', label: 'Exit' },
+      { key: '1', label: 'Проекты' },
+      { key: '2', label: 'Поиск' },
+      { key: '3', label: 'Агент (поиск данных доступа)' },
+      { key: '4', label: 'Заблокировать' },
+      { key: '5', label: 'Выход' },
     ]);
     if (action === '5') {
       vault.lockVault(key);
-      out.print('\nGoodbye.');
+      out.print('\nДо свидания.');
       return;
     }
     if (action === '4') {
       vault.lockVault(key);
-      out.print('\nVault locked.');
+      out.print('\nХранилище заблокировано');
       key = await unlockFlow(db);
       continue;
     }
@@ -118,9 +118,9 @@ async function mainMenu(db: Db, key: Buffer): Promise<void> {
 }
 
 function printProjectList(list: readonly Project[]): void {
-  out.print('\nProjects:');
+  out.print('\nПроекты:');
   if (list.length === 0) {
-    out.print('  (no projects yet)');
+    out.print('  (пока нет проектов)');
     return;
   }
   for (const project of list) {
@@ -134,11 +134,11 @@ async function projectsMenu(db: Db, key: Buffer): Promise<void> {
     const list = projects.listProjects(db);
     printProjectList(list);
     const action = await showMenu(null, [
-      { key: '1', label: 'Create project' },
-      { key: '2', label: 'Open project' },
-      { key: '3', label: 'Edit project' },
-      { key: '4', label: 'Delete project' },
-      { key: '5', label: 'Back' },
+      { key: '1', label: 'Создать проект' },
+      { key: '2', label: 'Открыть проект' },
+      { key: '3', label: 'Изменить проект' },
+      { key: '4', label: 'Удалить проект' },
+      { key: '5', label: 'Назад' },
     ]);
     if (action === '5') {
       return;
@@ -147,7 +147,7 @@ async function projectsMenu(db: Db, key: Buffer): Promise<void> {
       if (action === '1') {
         await createProjectFlow(db);
       } else if (action === '2') {
-        const picked = await pickById(list, 'project');
+        const picked = await pickById(list, 'проекта');
         if (picked !== null) {
           await projectMenu(db, key, picked);
         }
@@ -167,53 +167,60 @@ async function projectsMenu(db: Db, key: Buffer): Promise<void> {
 }
 
 async function createProjectFlow(db: Db): Promise<void> {
-  const name = await input.askRequired('Project name: ');
-  const description = await input.ask('Description (optional): ');
+  const name = await input.askRequired('Название проекта: ');
+  const description = await input.ask('Описание (необязательно): ');
   const project = projects.createProject(db, name, description);
-  out.print(`\nProject "${project.name}" created.`);
+  out.print(`\nПроект «${project.name}» создан.`);
 }
 
 async function editProjectFlow(db: Db, list: readonly Project[]): Promise<void> {
-  const picked = await pickById(list, 'project');
+  const picked = await pickById(list, 'проекта');
   if (picked === null) {
     return;
   }
-  out.print('\nLeave a value empty to keep the current one.');
-  const name = await input.ask(`Name [${picked.name}]: `);
-  const description = await input.ask(`Description [${picked.description || '(none)'}]: `);
+  out.print('Оставьте поле пустым, чтобы сохранить текущее значение.');
+  const name = await input.ask(`Название [${picked.name}]: `);
+  const description = await input.ask(`Описание [${picked.description || '(не указано)'}]: `);
   const updated = projects.updateProject(
     db,
     picked.id,
     name.trim() === '' ? picked.name : name,
     description.trim() === '' ? picked.description : description,
   );
-  out.print(`\nProject "${updated.name}" updated.`);
+  out.print(`\nПроект «${updated.name}» изменён.`);
 }
 
 async function deleteProjectFlow(db: Db, list: readonly Project[]): Promise<void> {
-  const picked = await pickById(list, 'project');
+  const picked = await pickById(list, 'проекта');
   if (picked === null) {
     return;
   }
   const confirmed = await input.confirm(
-    `Delete project "${picked.name}" and ALL its resources? This cannot be undone.`,
+    `Удалить проект «${picked.name}» и все его ресурсы? Это действие нельзя отменить.`,
   );
   if (!confirmed) {
-    out.print('Deletion cancelled.');
+    out.print('Удаление отменено.');
     return;
   }
   projects.deleteProject(db, picked.id);
-  out.print(`\nProject "${picked.name}" deleted.`);
+  out.print(`\nПроект «${picked.name}» удалён.`);
 }
 
 function resourceTypeLabel(type: string): string {
   return RESOURCE_TYPE_DEFS.find((def) => def.type === type)?.label ?? type;
 }
 
+function resourceFieldLabel(type: Resource['type'], fieldName: string): string {
+  if (fieldName === 'name') {
+    return 'Название';
+  }
+  return getResourceTypeDef(type).fields.find((field) => field.name === fieldName)?.label ?? fieldName;
+}
+
 function printResourceList(list: readonly Resource[]): void {
-  out.print('\nResources:');
+  out.print('\nРесурсы:');
   if (list.length === 0) {
-    out.print('  (no resources)');
+    out.print('  (нет ресурсов)');
     return;
   }
   for (const resource of list) {
@@ -223,13 +230,13 @@ function printResourceList(list: readonly Resource[]): void {
 
 async function projectMenu(db: Db, key: Buffer, project: Project): Promise<void> {
   for (;;) {
-    const action = await showMenu(`PROJECT: ${project.name}`, [
-      { key: '1', label: 'View resources' },
-      { key: '2', label: 'Add resource' },
-      { key: '3', label: 'Edit resource' },
-      { key: '4', label: 'Delete resource' },
-      { key: '5', label: 'Search in project' },
-      { key: '6', label: 'Back' },
+    const action = await showMenu(`ПРОЕКТ: ${project.name}`, [
+      { key: '1', label: 'Просмотр ресурсов' },
+      { key: '2', label: 'Добавить ресурс' },
+      { key: '3', label: 'Изменить ресурс' },
+      { key: '4', label: 'Удалить ресурс' },
+      { key: '5', label: 'Поиск в проекте' },
+      { key: '6', label: 'Назад' },
     ]);
     try {
       if (action === '6') {
@@ -256,15 +263,15 @@ async function projectMenu(db: Db, key: Buffer, project: Project): Promise<void>
 }
 
 async function addResourceFlow(db: Db, key: Buffer, project: Project): Promise<void> {
-  out.print('\nResource type:');
+  out.print('\nТип ресурса:');
   const typeOptions = RESOURCE_TYPE_DEFS.map((def, index) => ({
     key: String(index + 1),
     label: def.label,
   }));
   const chosenKey = await showMenu(null, typeOptions);
   const def = RESOURCE_TYPE_DEFS[Number(chosenKey) - 1];
-  const name = await input.askRequired('Name: ');
-  const description = await input.ask('Description (optional): ');
+  const name = await input.askRequired('Название: ');
+  const description = await input.ask('Описание (необязательно): ');
   const fields: Record<string, string> = {};
   for (const fieldDef of def.fields) {
     const value = await promptFieldValue(fieldDef);
@@ -273,7 +280,7 @@ async function addResourceFlow(db: Db, key: Buffer, project: Project): Promise<v
     }
   }
   const resource = resources.createResource(db, key, project.id, def.type, name, description, fields);
-  out.print(`\n${resourceTypeLabel(resource.type)} "${resource.name}" added.`);
+  out.print(`\n${resourceTypeLabel(resource.type)} «${resource.name}» добавлен.`);
 }
 
 async function viewResourcesFlow(db: Db, key: Buffer, project: Project): Promise<void> {
@@ -284,7 +291,7 @@ async function viewResourcesFlow(db: Db, key: Buffer, project: Project): Promise
       await input.pressEnter();
       return;
     }
-    const picked = await pickById(list, 'resource');
+    const picked = await pickById(list, 'ресурса');
     if (picked === null) {
       return;
     }
@@ -298,17 +305,17 @@ async function viewResourceFlow(db: Db, key: Buffer, resource: Resource): Promis
   const labels = new Map(def.fields.map((fieldDef) => [fieldDef.name, fieldDef.label]));
   out.print('');
   out.printDivider();
-  out.print(`Resource #${resource.id}: ${resource.name} (${def.label})`);
+  out.print(`Ресурс №${resource.id}: ${resource.name} (${def.label})`);
   out.printDivider();
-  out.print(`Name: ${resource.name}`);
-  out.print(`Description: ${resource.description || '(none)'}`);
+  out.print(`Название: ${resource.name}`);
+  out.print(`Описание: ${resource.description || '(не указано)'}`);
   for (const field of fields) {
     const label = labels.get(field.fieldName) ?? field.fieldName;
     out.print(`${label}: ${field.isSecret ? '********' : field.value}`);
   }
   const secretFields = fields.filter((field) => field.isSecret);
   if (secretFields.length > 0) {
-    const show = await input.confirm('Show secrets?');
+    const show = await input.confirm('Показать секреты?');
     if (show) {
       const revealed = resources.revealResourceFields(db, key, resource.id);
       for (const field of revealed) {
@@ -325,26 +332,26 @@ async function viewResourceFlow(db: Db, key: Buffer, resource: Resource): Promis
 async function editResourceFlow(db: Db, key: Buffer, project: Project): Promise<void> {
   const list = resources.listResources(db, project.id);
   if (list.length === 0) {
-    out.print('No resources in this project.');
+    out.print('В этом проекте нет ресурсов.');
     return;
   }
   printResourceList(list);
-  const picked = await pickById(list, 'resource');
+  const picked = await pickById(list, 'ресурса');
   if (picked === null) {
     return;
   }
   const def = getResourceTypeDef(picked.type);
   const currentFields = resources.getResourceFields(db, picked.id);
   const current = new Map(currentFields.map((field) => [field.fieldName, field.value]));
-  out.print(`\nEditing ${def.label} "${picked.name}" (#${picked.id}).`);
-  out.print('Leave a value empty to keep the current one.');
-  const name = await input.ask(`Name [${picked.name}]: `);
-  const description = await input.ask(`Description [${picked.description || '(none)'}]: `);
+  out.print(`\nИзменение: ${def.label} «${picked.name}» (№${picked.id}).`);
+  out.print('Оставьте поле пустым, чтобы сохранить текущее значение.');
+  const name = await input.ask(`Название [${picked.name}]: `);
+  const description = await input.ask(`Описание [${picked.description || '(не указано)'}]: `);
   const changes: Record<string, string | null> = {};
   for (const fieldDef of def.fields) {
     const hasCurrent = current.has(fieldDef.name);
     if (fieldDef.multiline) {
-      const change = await input.confirm(`Change ${fieldDef.label}?`);
+      const change = await input.confirm(`Изменить поле «${fieldDef.label}»?`);
       if (!change) {
         continue;
       }
@@ -355,8 +362,8 @@ async function editResourceFlow(db: Db, key: Buffer, project: Project): Promise<
       continue;
     }
     if (fieldDef.secret) {
-      out.print(`${fieldDef.label}: ${hasCurrent ? '********' : '(not set)'}`);
-      const value = await input.askSecret(`${fieldDef.label} (empty to keep): `);
+      out.print(`${fieldDef.label}: ${hasCurrent ? '********' : '(не задано)'}`);
+      const value = await input.askSecret(`${fieldDef.label} (пусто — оставить без изменений): `);
       if (value !== '') {
         changes[fieldDef.name] = value;
       }
@@ -370,7 +377,7 @@ async function editResourceFlow(db: Db, key: Buffer, project: Project): Promise<
     description: description.trim() === '' ? undefined : description,
     fields: changes,
   });
-  out.print('\nResource updated.');
+  out.print('\nРесурс изменён.');
 }
 
 async function promptOpenFieldUpdate(
@@ -400,50 +407,51 @@ async function promptOpenFieldUpdate(
 async function deleteResourceFlow(db: Db, project: Project): Promise<void> {
   const list = resources.listResources(db, project.id);
   if (list.length === 0) {
-    out.print('No resources in this project.');
+    out.print('В этом проекте нет ресурсов.');
     return;
   }
   printResourceList(list);
-  const picked = await pickById(list, 'resource');
+  const picked = await pickById(list, 'ресурса');
   if (picked === null) {
     return;
   }
-  const confirmed = await input.confirm(`Delete resource "${picked.name}"? This cannot be undone.`);
+  const confirmed = await input.confirm(`Удалить ресурс «${picked.name}»? Это действие нельзя отменить.`);
   if (!confirmed) {
-    out.print('Deletion cancelled.');
+    out.print('Удаление отменено.');
     return;
   }
   resources.deleteResource(db, picked.id);
-  out.print(`\nResource "${picked.name}" deleted.`);
+  out.print(`\nРесурс «${picked.name}» удалён.`);
 }
 
 async function searchMenu(db: Db, key: Buffer, projectId: number | null): Promise<void> {
-  const query = (await input.ask('\nSearch: ')).trim();
+  const query = (await input.ask('\nПоиск: ')).trim();
   if (query === '') {
     return;
   }
   const projectMatches = projectId === null ? projects.searchProjects(db, query) : [];
   const resourceMatches = resources.searchResources(db, query, projectId);
   if (projectMatches.length === 0 && resourceMatches.length === 0) {
-    out.print('Nothing found.');
+    out.print('Ничего не найдено.');
     return;
   }
-  out.print(`\nSearch results for "${query}":`);
+  out.print(`
+Результаты поиска для «${query}»:`);
   if (projectMatches.length > 0) {
-    out.print('\nProjects:');
+    out.print('\nПроекты:');
     for (const project of projectMatches) {
       const description = project.description !== '' ? ` — ${project.description}` : '';
       out.print(`  ${project.id}. ${project.name}${description}`);
     }
   }
   if (resourceMatches.length > 0) {
-    out.print('\nResources:');
+    out.print('\nРесурсы:');
     for (const match of resourceMatches) {
       const where =
         match.matchedField !== null && match.matchedValue !== null
-          ? ` — ${match.matchedField}: ${match.matchedValue}`
+          ? ` — ${resourceFieldLabel(match.resource.type, match.matchedField)}: ${match.matchedValue}`
           : '';
-      out.print(`  [${match.projectName}] ${resourceTypeLabel(match.resource.type)} "${match.resource.name}"${where}`);
+      out.print(`  [${match.projectName}] ${resourceTypeLabel(match.resource.type)} «${match.resource.name}»${where}`);
     }
   }
   if (projectId !== null) {
@@ -459,7 +467,7 @@ async function searchMenu(db: Db, key: Buffer, projectId: number | null): Promis
       }
     }
   }
-  const picked = await pickById(openable, 'project to open');
+  const picked = await pickById(openable, 'проекта для открытия');
   if (picked !== null) {
     await projectMenu(db, key, picked);
   }
@@ -467,29 +475,29 @@ async function searchMenu(db: Db, key: Buffer, projectId: number | null): Promis
 
 async function agentMenu(db: Db, key: Buffer): Promise<void> {
   for (;;) {
-    const action = await showMenu('DEVVAULT AGENT', [
-      { key: '1', label: 'Scan pasted text' },
-      { key: '2', label: 'Scan a .env file' },
-      { key: '3', label: 'Back' },
+    const action = await showMenu('АГЕНТ DEVVAULT', [
+      { key: '1', label: 'Сканировать вставленный текст' },
+      { key: '2', label: 'Сканировать файл .env' },
+      { key: '3', label: 'Назад' },
     ]);
     if (action === '3') {
       return;
     }
     if (action === '1') {
-      const text = await input.askMultiline('Paste text:');
-      await runScan(db, key, 'text input', text);
+      const text = await input.askMultiline('Вставьте текст:');
+      await runScan(db, key, 'вставленный текст', text);
       continue;
     }
     if (action === '2') {
-      const path = (await input.ask('Path to .env file: ')).trim();
+      const path = (await input.ask('Путь к файлу .env: ')).trim();
       if (path === '') {
         continue;
       }
       try {
         const text = await readFile(path, 'utf8');
-        await runScan(db, key, `.env file ${basename(path)}`, text);
+        await runScan(db, key, `файл .env ${basename(path)}`, text);
       } catch (error) {
-        out.printError(`Cannot read file: ${error instanceof Error ? error.message : String(error)}`);
+        out.printError(`Не удалось прочитать файл: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
   }

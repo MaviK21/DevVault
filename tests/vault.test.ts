@@ -70,7 +70,7 @@ describe('vault', () => {
     expect(() => validateMasterPassword('a'.repeat(MIN_PASSWORD_LENGTH - 1))).toThrow(
       ValidationError,
     );
-    expect(() => validateMasterPassword('short')).toThrow(/at least 8/);
+    expect(() => validateMasterPassword('short')).toThrow(/не менее 8/);
   });
 
   it('refuses to create a second vault', async () => {

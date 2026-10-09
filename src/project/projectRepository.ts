@@ -34,7 +34,7 @@ export function createProject(db: Db, name: string, description: string): Projec
     .run(name.trim(), description.trim(), now, now);
   const project = getProject(db, Number(info.lastInsertRowid));
   if (project === null) {
-    throw new Error('Failed to read back the created project.');
+    throw new Error('Не удалось получить созданный проект из базы данных.');
   }
   return project;
 }
@@ -59,7 +59,7 @@ export function findProjectByName(db: Db, name: string): Project | null {
 export function updateProject(db: Db, id: number, name: string, description: string): Project {
   const existing = getProject(db, id);
   if (existing === null) {
-    throw new ValidationError(`Project #${id} not found.`);
+    throw new ValidationError(`Проект №${id} не найден.`);
   }
   validateProjectName(name);
   const duplicate = findProjectByName(db, name);
@@ -74,7 +74,7 @@ export function updateProject(db: Db, id: number, name: string, description: str
   );
   const updated = getProject(db, id);
   if (updated === null) {
-    throw new Error('Failed to read back the updated project.');
+    throw new Error('Не удалось получить изменённый проект из базы данных.');
   }
   return updated;
 }

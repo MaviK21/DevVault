@@ -25,7 +25,7 @@ interface FieldRow {
 
 function mapResource(row: ResourceRow): Resource {
   if (!isResourceType(row.type)) {
-    throw new ValidationError(`Unknown resource type in database: ${row.type}`);
+    throw new ValidationError(`В базе данных указан неизвестный тип ресурса: ${row.type}`);
   }
   return {
     id: row.id,
@@ -53,11 +53,11 @@ export function createResource(
 ): Resource {
   const def = getResourceTypeDef(type);
   if (name.trim() === '') {
-    throw new ValidationError('Resource name must not be empty.');
+    throw new ValidationError('Название ресурса не должно быть пустым.');
   }
   for (const fieldDef of def.fields) {
     if (fieldDef.required && (fields[fieldDef.name] ?? '').trim() === '') {
-      throw new ValidationError(`Field "${fieldDef.label}" is required for ${def.label}.`);
+      throw new ValidationError(`Поле «${fieldDef.label}» обязательно для ресурса «${def.label}».`);
     }
   }
   const now = nowIso();
@@ -84,7 +84,7 @@ export function createResource(
   const resourceId = tx();
   const resource = getResource(db, resourceId);
   if (resource === null) {
-    throw new Error('Failed to read back the created resource.');
+    throw new Error('Не удалось получить созданный ресурс из базы данных.');
   }
   return resource;
 }
@@ -130,7 +130,7 @@ export interface ResourceChanges {
 export function updateResource(db: Db, key: Buffer, resourceId: number, changes: ResourceChanges): Resource {
   const existing = getResource(db, resourceId);
   if (existing === null) {
-    throw new NotFoundError(`Resource #${resourceId} not found.`);
+    throw new NotFoundError(`Ресурс №${resourceId} не найден.`);
   }
   const def = getResourceTypeDef(existing.type);
   const now = nowIso();
@@ -173,7 +173,7 @@ export function updateResource(db: Db, key: Buffer, resourceId: number, changes:
   })();
   const updated = getResource(db, resourceId);
   if (updated === null) {
-    throw new NotFoundError(`Resource #${resourceId} not found.`);
+    throw new NotFoundError(`Ресурс №${resourceId} не найден.`);
   }
   return updated;
 }

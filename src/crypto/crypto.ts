@@ -52,10 +52,10 @@ export function decrypt(key: Buffer, blob: string): string {
   try {
     raw = Buffer.from(blob, 'base64');
   } catch {
-    throw new CryptoError('Stored value is not valid base64 data.');
+    throw new CryptoError('Сохранённое значение не является корректными данными base64.');
   }
   if (raw.length < NONCE_LENGTH + TAG_LENGTH) {
-    throw new CryptoError('Stored value is corrupted (too short).');
+    throw new CryptoError('Сохранённое значение повреждено (слишком короткое).');
   }
   const nonce = raw.subarray(0, NONCE_LENGTH);
   const tag = raw.subarray(raw.length - TAG_LENGTH);
@@ -65,7 +65,7 @@ export function decrypt(key: Buffer, blob: string): string {
     decipher.setAuthTag(tag);
     return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
   } catch {
-    throw new CryptoError('Decryption failed: wrong key or corrupted data.');
+    throw new CryptoError('Не удалось расшифровать данные: неверный ключ или данные повреждены.');
   }
 }
 

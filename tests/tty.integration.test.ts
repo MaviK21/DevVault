@@ -93,18 +93,18 @@ describe('CLI in a real pseudo-console (TTY raw mode)', () => {
     dirs.push(dir);
     const session = new PtySession(dir);
     try {
-      await session.waitFor('Create a new Vault?');
+      await session.waitFor('Создать новое хранилище?');
       session.write('y\r');
-      await session.waitFor('Master password: ');
+      await session.waitFor('Мастер-пароль: ');
       session.write('Password123!');
       await session.waitFor('************'); // 12 masked characters echoed
       session.write('\r');
-      await session.waitFor('Confirm password: ');
+      await session.waitFor('Подтвердите пароль: ');
       session.write('Password123!\r');
-      await session.waitFor('Vault created.');
-      await session.waitFor('5. Exit');
+      await session.waitFor('Хранилище создано.');
+      await session.waitFor('5. Выход');
       session.write('5\r');
-      await session.waitFor('Goodbye.');
+      await session.waitFor('До свидания.');
       expect(await session.waitForExit()).toBe(0);
       expect(session.text).not.toContain('Password123!');
     } finally {
@@ -117,18 +117,18 @@ describe('CLI in a real pseudo-console (TTY raw mode)', () => {
     dirs.push(dir);
     const session = new PtySession(dir);
     try {
-      await session.waitFor('Create a new Vault?');
+      await session.waitFor('Создать новое хранилище?');
       session.write('y\r');
-      await session.waitFor('Master password: ');
+      await session.waitFor('Мастер-пароль: ');
       session.write('X'); // wrong char...
       await session.waitFor('*');
       session.write('\x7f'); // ...erased with Backspace
       session.write('Password123!');
       await session.waitFor('************'); // 12 masked characters echoed
       session.write('\r');
-      await session.waitFor('Confirm password: ');
+      await session.waitFor('Подтвердите пароль: ');
       session.write('Password123!\r');
-      await session.waitFor('Vault created.');
+      await session.waitFor('Хранилище создано.');
       session.write('5\r');
       expect(await session.waitForExit()).toBe(0);
     } finally {
@@ -141,7 +141,7 @@ describe('CLI in a real pseudo-console (TTY raw mode)', () => {
     dirs.push(dir);
     const session = new PtySession(dir);
     try {
-      await session.waitFor('Create a new Vault?');
+      await session.waitFor('Создать новое хранилище?');
       session.write('\x03');
       expect(await session.waitForExit()).toBe(130);
     } finally {

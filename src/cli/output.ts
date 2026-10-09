@@ -5,7 +5,7 @@ export function print(text = ''): void {
 }
 
 export function printError(message: string): void {
-  print(`ERROR: ${message}`);
+  print(`ОШИБКА: ${message}`);
 }
 
 export function printBanner(): void {

@@ -2,15 +2,15 @@ import { AppError, ValidationError } from '../errors';
 
 export class DuplicateProjectError extends AppError {
   constructor(readonly projectName: string) {
-    super(`Project "${projectName}" already exists.`);
+    super(`Проект «${projectName}» уже существует.`);
   }
 }
 
 export function validateProjectName(name: string): void {
   if (name.trim() === '') {
-    throw new ValidationError('Project name must not be empty.');
+    throw new ValidationError('Название проекта не должно быть пустым.');
   }
   if (name.trim().length > 200) {
-    throw new ValidationError('Project name is too long (max 200 characters).');
+    throw new ValidationError('Название проекта слишком длинное (максимум 200 символов).');
   }
 }

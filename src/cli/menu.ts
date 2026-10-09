@@ -9,7 +9,7 @@ export async function showMenu(title: string | null, options: readonly input.Men
   for (const option of options) {
     out.print(`${option.key}. ${option.label}`);
   }
-  return input.chooseOption('Select an action: ', options);
+  return input.chooseOption('Выберите действие: ', options);
 }
 
 /**
@@ -18,7 +18,7 @@ export async function showMenu(title: string | null, options: readonly input.Men
  */
 export async function pickById<T extends { id: number }>(items: readonly T[], label: string): Promise<T | null> {
   for (;;) {
-    const raw = (await input.ask(`Enter ${label} number (or empty to cancel): `)).trim();
+    const raw = (await input.ask(`Введите номер ${label} (или нажмите Enter, чтобы отменить): `)).trim();
     if (raw === '') {
       return null;
     }
@@ -27,6 +27,6 @@ export async function pickById<T extends { id: number }>(items: readonly T[], la
     if (item !== undefined) {
       return item;
     }
-    out.printError(`No ${label} with number ${raw}.`);
+    out.printError(`Не найдено: ${label} с номером ${raw}.`);
   }
 }

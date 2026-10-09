@@ -146,7 +146,8 @@ export const MULTILINE_TERMINATOR = '.';
 
 /** Reads multiple lines until a line containing only "." (ТЗ §30). */
 export async function askMultiline(prompt: string, opts: { secret?: boolean } = {}): Promise<string> {
-  stdout.write(`${prompt} (finish with a single "${MULTILINE_TERMINATOR}" line)\n`);
+  stdout.write(`${prompt} (для завершения введите отдельной строкой "${MULTILINE_TERMINATOR}")\n`);
+
   const lines: string[] = [];
   for (;;) {
     const line = opts.secret === true ? await askSecret('') : await ask('');
@@ -160,10 +161,10 @@ export async function askMultiline(prompt: string, opts: { secret?: boolean } = 
 
 export function parseYesNo(raw: string): boolean | null {
   const value = raw.trim().toLowerCase();
-  if (value === 'y' || value === 'yes') {
+  if (value === 'y' || value === 'yes' || value === 'да') {
     return true;
   }
-  if (value === 'n' || value === 'no') {
+  if (value === 'n' || value === 'no' || value === 'нет') {
     return false;
   }
   return null;
@@ -175,24 +176,24 @@ export async function askRequired(prompt: string): Promise<string> {
     if (value.trim() !== '') {
       return value.trim();
     }
-    stdout.write('This field is required.\n');
+    stdout.write('Это поле обязательно.\n');
   }
 }
 
 export async function confirm(question: string): Promise<boolean> {
   stdout.write(`\n${question}\n`);
   for (;;) {
-    const answer = await ask('[Y] Yes / [N] No: ');
+    const answer = await ask('[Y] Да / [N] Нет: ');
     const parsed = parseYesNo(answer);
     if (parsed === null) {
-      stdout.write('Please answer Y or N.\n');
+      stdout.write('Введите Y (да) или N (нет).\n');
       continue;
     }
     return parsed;
   }
 }
 
-export async function pressEnter(prompt = 'Press Enter to continue: '): Promise<void> {
+export async function pressEnter(prompt = 'Нажмите Enter, чтобы продолжить: '): Promise<void> {
   await ask(prompt);
 }
 
@@ -209,6 +210,6 @@ export async function chooseOption(prompt: string, options: readonly MenuOption[
     if (option !== undefined) {
       return option.key;
     }
-    stdout.write(`Invalid choice "${raw}". Options: ${options.map((o) => o.key).join(', ')}.\n`);
+    stdout.write(`Неверный выбор «${raw}». Допустимые варианты: ${options.map((o) => o.key).join(', ')}.\n`);
   }
 }

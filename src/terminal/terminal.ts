@@ -1,5 +1,6 @@
 import * as out from '../cli/output';
 import type { Detection } from '../agent/classifier';
+import { getResourceTypeDef } from '../resource/resource';
 
 const SECRET_MASK = '********';
 
@@ -19,8 +20,8 @@ function isSecretFieldName(fieldName: string): boolean {
   return SECRET_FIELD_PATTERN.test(fieldName);
 }
 
-function capitalize(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
+function fieldLabel(fieldName: string, type: Detection['type']): string {
+  return getResourceTypeDef(type).fields.find((field) => field.name === fieldName)?.label ?? fieldName;
 }
 
 /**
@@ -34,20 +35,20 @@ export function renderDetection(detection: Detection): void {
     .map(([, value]) => value);
   out.print('');
   out.print('========================================');
-  out.print('DEVVAULT DETECTION');
+  out.print('АГЕНТ DEVVAULT — ОБНАРУЖЕНИЕ');
   out.print('========================================');
   out.print('');
-  out.print('NEW CREDENTIAL');
+  out.print('ОБНАРУЖЕНЫ ДАННЫЕ ДОСТУПА');
   out.print('');
-  out.print(`Type: ${detection.type}`);
-  out.print(`Source: ${detection.source}`);
-  out.print(`Context: ${out.truncate(out.maskValues(detection.context, secretValues), 120)}`);
+  out.print(`Тип: ${getResourceTypeDef(detection.type).label}`);
+  out.print(`Источник: ${detection.source}`);
+  out.print(`Контекст: ${out.truncate(out.maskValues(detection.context, secretValues), 120)}`);
   for (const [name, value] of Object.entries(detection.fields)) {
-    const shown = isSecretFieldName(name) ? `${SECRET_MASK} (hidden, will be encrypted)` : value;
-    out.print(`${capitalize(name)}: ${shown}`);
+    const shown = isSecretFieldName(name) ? `${SECRET_MASK} (скрыто, будет зашифровано)` : value;
+    out.print(`${fieldLabel(name, detection.type)}: ${shown}`);
   }
-  out.print(`Name: ${detection.suggestedName}`);
-  out.print(`Confidence: ${Math.round(detection.confidence * 100)}%`);
+  out.print(`Название: ${detection.suggestedName}`);
+  out.print(`Уверенность: ${Math.round(detection.confidence * 100)}%`);
   out.print('');
-  out.print('[Y] Save   [N] Ignore   [E] Edit');
+  out.print('[Y] Сохранить   [N] Игнорировать   [E] Изменить');
 }

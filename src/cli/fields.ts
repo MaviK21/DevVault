@@ -26,7 +26,7 @@ export async function promptFieldValue(fieldDef: FieldDef): Promise<string> {
     value = value.trim();
     if (value === '') {
       if (fieldDef.required) {
-        out.printError(`${fieldDef.label} is required.`);
+        out.printError(`Поле «${fieldDef.label}» обязательно.`);
         continue;
       }
       return '';

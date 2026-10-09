@@ -57,13 +57,13 @@ describe('resource repository', () => {
     const projectId = createProject(db, 'Karimoff', '').id;
     expect(() =>
       createResource(db, key, projectId, 'website', 'Site', '', { protocol: 'https' }),
-    ).toThrow(/Domain.*required/);
+    ).toThrow(/Домен.*обязательно/);
     expect(() =>
       createResource(db, key, projectId, 'server', 'Bad port', '', { host: 'h', port: '99999' }),
-    ).toThrow(/Port must be/);
+    ).toThrow(/Порт должен быть/);
     expect(() =>
       createResource(db, key, projectId, 'server', 'Bad port', '', { host: 'h', port: 'abc' }),
-    ).toThrow(/Port must be/);
+    ).toThrow(/Порт должен быть/);
   });
 
   it('updates open fields, replaces secrets and keeps secrets on null', () => {

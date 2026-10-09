@@ -61,23 +61,23 @@ describe('CLI integration (piped input)', () => {
     const { code, stdout } = await runCli(dir, 'n\n');
     expect(code).toBe(0);
     expect(stdout).toContain('DEVVAULT');
-    expect(stdout).toContain('Vault not found.');
-    expect(stdout).toContain('Create a new Vault?');
-    expect(stdout).toContain('Goodbye');
+    expect(stdout).toContain('Хранилище не найдено.');
+    expect(stdout).toContain('Создать новое хранилище?');
+    expect(stdout).toContain('До свидания');
   }, 120_000);
 
   it('rejects a short master password', async () => {
     const dir = newDir();
     dirs.push(dir);
     const { stdout } = await runCli(dir, 'y\nshort\nshort\n');
-    expect(stdout).toContain('at least 8');
+    expect(stdout).toContain('не менее 8');
   }, 120_000);
 
   it('rejects mismatched password confirmation', async () => {
     const dir = newDir();
     dirs.push(dir);
     const { stdout } = await runCli(dir, 'y\nPassword123!\nDifferent123!\n');
-    expect(stdout).toContain('do not match');
+    expect(stdout).toContain('не совпадают');
   }, 120_000);
 
   it('creates a vault, rejects 3 wrong passwords, then unlocks', async () => {
@@ -85,18 +85,18 @@ describe('CLI integration (piped input)', () => {
     dirs.push(dir);
     const created = await runCli(dir, 'y\nPassword123!\nPassword123!\n5\n');
     expect(created.code).toBe(0);
-    expect(created.stdout).toContain('Vault created.');
-    expect(created.stdout).toContain('Goodbye.');
+    expect(created.stdout).toContain('Хранилище создано.');
+    expect(created.stdout).toContain('До свидания.');
 
     const wrong = await runCli(dir, 'wrongpass1\nwrongpass2\nwrongpass3\n');
     expect(wrong.code).toBe(1);
-    expect(wrong.stdout).toContain('Attempts left: 2.');
-    expect(wrong.stdout).toContain('Attempts left: 1.');
-    expect(wrong.stdout).toContain('Too many failed attempts.');
+    expect(wrong.stdout).toContain('Осталось попыток: 2.');
+    expect(wrong.stdout).toContain('Осталось попыток: 1.');
+    expect(wrong.stdout).toContain('Слишком много неудачных попыток.');
 
     const unlocked = await runCli(dir, 'Password123!\n5\n');
     expect(unlocked.code).toBe(0);
-    expect(unlocked.stdout).toContain('Vault unlocked.');
+    expect(unlocked.stdout).toContain('Хранилище разблокировано.');
   }, 180_000);
 
   it('supports project and resource CRUD plus search via the menus', async () => {
@@ -137,12 +137,12 @@ describe('CLI integration (piped input)', () => {
       ].join('\n') + '\n',
     );
     expect(code).toBe(0);
-    expect(stdout).toContain('PROJECT: Karimoff');
-    expect(stdout).toContain('added.');
+    expect(stdout).toContain('ПРОЕКТ: Karimoff');
+    expect(stdout).toContain('добавлен.');
     expect(stdout).toContain('185.123.45.67');
     expect(stdout).toContain('********');
-    expect(stdout).toContain('"Production"');
-    expect(stdout).toContain('Search results for "Production"');
+    expect(stdout).toContain('«Production»');
+    expect(stdout).toContain('Результаты поиска для «Production»:');
     expect(stdout).toContain('Karimoff');
     expect(stdout).not.toContain('S3cret!Pass');
   }, 180_000);
@@ -178,10 +178,10 @@ describe('CLI integration (piped input)', () => {
       ].join('\n') + '\n',
     );
     expect(code).toBe(0);
-    expect(stdout).toContain('DEVVAULT DETECTION');
-    expect(stdout).toContain('Type: ssh');
-    expect(stdout).toContain('Confidence: 95%');
-    expect(stdout).toContain('(no resources)');
+    expect(stdout).toContain('АГЕНТ DEVVAULT — ОБНАРУЖЕНИЕ');
+    expect(stdout).toContain('Тип: SSH');
+    expect(stdout).toContain('Уверенность: 95%');
+    expect(stdout).toContain('(нет ресурсов)');
   }, 180_000);
 
   it('agent saves a detected credential after explicit confirmation', async () => {
@@ -218,9 +218,9 @@ describe('CLI integration (piped input)', () => {
       ].join('\n') + '\n',
     );
     expect(code).toBe(0);
-    expect(stdout).toContain('Type: database');
-    expect(stdout).toContain('Confidence: 90%');
-    expect(stdout).toContain('Saved database');
+    expect(stdout).toContain('Тип: База данных');
+    expect(stdout).toContain('Уверенность: 90%');
+    expect(stdout).toContain('Сохранено: База данных');
     expect(stdout).toContain('198.51.100.7');
     expect(stdout).toContain('********');
     expect(stdout).not.toContain('Sup3rPass');

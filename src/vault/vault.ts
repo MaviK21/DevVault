@@ -34,7 +34,7 @@ export function getVaultMeta(db: Db): VaultMeta {
     .prepare('SELECT kdf_salt, kdf_params, verifier FROM vault_meta WHERE id = 1')
     .get() as VaultMetaRow | undefined;
   if (row === undefined) {
-    throw new VaultNotFoundError('Vault not found. Create a Vault first.');
+    throw new VaultNotFoundError('Хранилище не найдено. Сначала создайте хранилище.');
   }
   return {
     kdfSalt: row.kdf_salt,
@@ -46,7 +46,7 @@ export function getVaultMeta(db: Db): VaultMeta {
 export function validateMasterPassword(password: string): void {
   if (password.length < MIN_PASSWORD_LENGTH) {
     throw new ValidationError(
-      `Master password must be at least ${MIN_PASSWORD_LENGTH} characters long.`,
+      `Мастер-пароль должен содержать не менее ${MIN_PASSWORD_LENGTH} символов.`,
     );
   }
 }
@@ -58,11 +58,11 @@ export function validateMasterPassword(password: string): void {
  */
 export async function createVault(db: Db, password: string, confirmPassword: string): Promise<Buffer> {
   if (vaultExists(db)) {
-    throw new VaultExistsError('Vault already exists.');
+    throw new VaultExistsError('Хранилище уже существует.');
   }
   validateMasterPassword(password);
   if (password !== confirmPassword) {
-    throw new PasswordMismatchError('Passwords do not match.');
+    throw new PasswordMismatchError('Пароли не совпадают.');
   }
   const salt = generateSalt();
   const key = await deriveKey(password, salt, DEFAULT_KDF_PARAMS);

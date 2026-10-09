@@ -12,7 +12,7 @@ run().then(
     }
     const message = error instanceof Error ? error.message : String(error);
     // Never print error objects that could contain secrets (ТЗ §43, §49).
-    process.stdout.write(`\nERROR: ${message}\n`);
+    process.stdout.write(`\nОШИБКА: ${message}\n`);
     process.exit(1);
   },
 );

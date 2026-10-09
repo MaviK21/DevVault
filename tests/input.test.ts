@@ -9,9 +9,13 @@ describe('input helpers', () => {
     expect(parseYesNo('y')).toBe(true);
     expect(parseYesNo('Y')).toBe(true);
     expect(parseYesNo(' yes ')).toBe(true);
+    expect(parseYesNo('да')).toBe(true);
+    expect(parseYesNo(' ДА ')).toBe(true);
     expect(parseYesNo('n')).toBe(false);
     expect(parseYesNo('N')).toBe(false);
     expect(parseYesNo('no')).toBe(false);
+    expect(parseYesNo('нет')).toBe(false);
+    expect(parseYesNo(' НЕТ ')).toBe(false);
     expect(parseYesNo('')).toBeNull();
     expect(parseYesNo('maybe')).toBeNull();
     expect(parseYesNo('1')).toBeNull();
